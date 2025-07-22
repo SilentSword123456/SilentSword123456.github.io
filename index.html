@@ -27,87 +27,6 @@
             width: 200px;
         }
         
-        /* Running Fox Animation Container */
-        .fox-runner {
-            position: fixed;
-            bottom: 20%;
-            left: -300px;
-            z-index: 5;
-            animation: runAcross 8s linear infinite;
-        }
-        
-        .fox-runner img {
-            width: 150px;
-            height: auto;
-            animation: bounce 0.6s ease-in-out infinite;
-            filter: drop-shadow(0 0 20px #ff00ff) drop-shadow(0 0 40px #00ffff);
-        }
-        
-        /* Running animation - fox moves across screen */
-        @keyframes runAcross {
-            0% {
-                left: -300px;
-            }
-            100% {
-                left: calc(100vw + 100px);
-            }
-        }
-        
-        /* Bouncing animation - simulates running motion */
-        @keyframes bounce {
-            0%, 100% {
-                transform: translateY(0) scaleY(1);
-            }
-            50% {
-                transform: translateY(-15px) scaleY(0.95);
-            }
-        }
-        
-        /* Particle trail effect */
-        .particle-trail {
-            position: fixed;
-            bottom: 25%;
-            left: -300px;
-            z-index: 4;
-            animation: trailFollow 8s linear infinite;
-        }
-        
-        .particle {
-            width: 4px;
-            height: 4px;
-            background: #00ffff;
-            position: absolute;
-            border-radius: 50%;
-            box-shadow: 0 0 10px #00ffff;
-            animation: particleFade 0.8s linear infinite;
-        }
-        
-        .particle:nth-child(1) { animation-delay: 0s; left: -20px; }
-        .particle:nth-child(2) { animation-delay: 0.1s; left: -40px; }
-        .particle:nth-child(3) { animation-delay: 0.2s; left: -60px; }
-        .particle:nth-child(4) { animation-delay: 0.3s; left: -80px; }
-        .particle:nth-child(5) { animation-delay: 0.4s; left: -100px; }
-        
-        @keyframes trailFollow {
-            0% {
-                left: -300px;
-            }
-            100% {
-                left: calc(100vw + 100px);
-            }
-        }
-        
-        @keyframes particleFade {
-            0% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: scale(0.3);
-            }
-        }
-        
         /* Enhanced glow effects for main logo */
         .main-logo {
             animation: logoGlow 3s ease-in-out infinite alternate;
@@ -140,27 +59,6 @@
         p {
             text-shadow: 0 0 5px #00ffcc;
         }
-        
-        /* Optional: Click to trigger fox run */
-        .trigger-fox {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(0, 255, 204, 0.2);
-            border: 1px solid #00ffcc;
-            color: #00ffcc;
-            padding: 8px 12px;
-            border-radius: 4px;
-            font-family: monospace;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.3s ease;
-        }
-        
-        .trigger-fox:hover {
-            background: rgba(0, 255, 204, 0.4);
-            box-shadow: 0 0 15px #00ffcc;
-        }
     </style>
 </head>
 <script src="script.js"></script>
@@ -171,11 +69,6 @@
     <p>This is the beginning of something awesome.</p>
 </div>
 
-<!-- Running Fox Animation -->
-<div class="fox-runner">
-    <img src="running-fox.png" alt="Running Cyberpunk Fox">
-</div>
-
 <!-- Particle Trail -->
 <div class="particle-trail">
     <div class="particle"></div>
@@ -184,10 +77,6 @@
     <div class="particle"></div>
     <div class="particle"></div>
 </div>
-
-<!-- Optional trigger button -->
-<button class="trigger-fox" onclick="restartAnimation()">RUN FOX</button>
-
 <script>
     function sayHello(){
         console.log("Hello from SilentLab!");
@@ -197,9 +86,6 @@
         const foxRunner = document.querySelector('.fox-runner');
         const particles = document.querySelector('.particle-trail');
 
-        // Restart animations
-        foxRunner.style.animation = 'none';
-        particles.style.animation = 'none';
 
         setTimeout(() => {
             foxRunner.style.animation = 'runAcross 8s linear infinite';
