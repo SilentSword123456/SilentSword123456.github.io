@@ -52,17 +52,30 @@
 
         /* Text glow animation */
         h1 {
-            animation: textPulse 2s ease-in-out infinite alternate;
-            text-shadow: 0 0 10px #00ffcc;
+            animation: textAnimate 6s ease-in-out infinite;
             margin: 20px 0;
         }
 
-        @keyframes textPulse {
+        @keyframes textAnimate {
             0% {
+                color: #00ffcc;
                 text-shadow: 0 0 10px #00ffcc;
             }
+            25% {
+                color: #0094fc;
+                text-shadow: 0 0 20px #0094fc;
+            }
+            50% {
+                color: #821bef;
+                text-shadow: 0 0 15px #821bef;
+            }
+            75% {
+                color: #ff00ff;
+                text-shadow: 0 0 10px #ff00ff;
+            }
             100% {
-                text-shadow: 0 0 20px #00ffcc, 0 0 30px #00ffcc;
+                color: #00ffcc;
+                text-shadow: 0 0 10px #00ffcc;
             }
         }
 
@@ -133,121 +146,5 @@
     <div class="particle"></div>
     <div class="particle"></div>
 </div>
-
-<script>
-    // JavaScript Tutorial for C++ Programmers
-
-    // 1. Variables - Similar to C++, but more flexible
-    // In C++: int number = 42;
-    // In JS: Variables are dynamically typed
-    let number = 42;           // like auto in modern C++
-    const PI = 3.14159;        // like const in C++
-    var oldStyle = "avoid";    // older way, like global variables
-
-    // 2. Functions - Similar to C++ functions but more flexible
-    // In C++: void sayHello() { std::cout << "Hello!\n"; }
-    function sayHello() {
-        console.log("Hello from SilentLab!"); // console.log is like std::cout
-    }
-
-    // Arrow functions (like lambda functions in C++)
-    // In C++: auto add = [](int a, int b) { return a + b; };
-    const add = (a, b) => a + b;
-
-    // 3. Objects - Like structs/classes but more flexible
-    // In C++: struct Config { bool debug; int version; };
-    const config = {
-        debug: true,
-        version: 1,
-        name: "SilentLab"
-    };
-
-    // 4. Arrays - Like std::vector but built-in
-    // In C++: std::vector<std::string> colors = {"red", "green", "blue"};
-    const colors = ["red", "green", "blue"];
-
-    // 5. DOM Manipulation - Like pointer manipulation but for HTML elements
-    // Think of DOM elements like objects in memory that you can modify
-    function enhanceParticles() {
-        // querySelector is like finding an object by its address
-        // Similar to: MyClass* element = findElementById("myId");
-        const particles = document.querySelectorAll('.particle');
-
-        // forEach is like a range-based for loop in C++11+
-        // In C++: for (auto& particle : particleContainer)
-        particles.forEach((particle, index) => {
-            // Adding event listeners is like registering callback functions
-            // Similar to function pointers in C++
-            particle.addEventListener('animationend', () => {
-                console.log(`Particle ${index} finished animating`);
-            });
-
-            // Modifying properties is like changing member variables
-            particle.style.boxShadow = `0 0 10px #00ffcc`;
-        });
-    }
-
-    // 6. Event Handling - Like callback functions or function pointers
-    // In C++: void onButtonClick() { /* handle click */ }
-    // window.addEventListener is like registering a callback
-    window.addEventListener('load', () => {
-        console.log("Page loaded - starting animations");
-        enhanceParticles();
-
-        // setTimeout is like a delayed function call
-        // Similar to: std::this_thread::sleep_for + function call
-        setTimeout(() => {
-            sayHello();
-        }, 1000); // Wait 1 second, then call sayHello
-    });
-
-    // 7. Asynchronous Programming - Different from C++
-    // JavaScript is single-threaded but uses event loops
-    // Think of it like having one main thread that handles events in a queue
-
-    // 8. Scope and Closures - Similar to C++ scope but more flexible
-    function createCounter() {
-        let count = 0; // This is like a private member variable
-
-        // Return a function that has access to count (closure)
-        // Like returning a lambda that captures local variables
-        return function() {
-            count++;
-            return count;
-        };
-    }
-
-    const counter = createCounter();
-    console.log(counter()); // 1
-    console.log(counter()); // 2
-
-    // 9. Error Handling - Similar to try/catch in C++
-    try {
-        // Risky operation
-        const result = riskyFunction();
-    } catch (error) {
-        console.error("Something went wrong:", error.message);
-    } finally {
-        // Always runs, like destructor cleanup
-        console.log("Cleanup completed");
-    }
-
-    // Placeholder for riskyFunction to avoid error
-    function riskyFunction() {
-        return "success";
-    }
-
-    // 10. Modern JavaScript features you'll love coming from C++
-
-    // Destructuring - like structured bindings in C++17
-    const point = {x: 10, y: 20};
-    const {x, y} = point; // Like: auto [x, y] = point;
-
-    // Template literals - like string formatting
-    // In C++: std::format("Position: ({}, {})", x, y);
-    const message = `Position: (${x}, ${y})`;
-
-    console.log("JavaScript tutorial complete!");
-</script>
 </body>
 </html>
