@@ -21,7 +21,7 @@ body {
 
 .main-logo {
     width: 200px;
-    animation: logoGlow 3s ease-in-out infinite alternate, float 16s ease-in-out infinite;
+    animation: /*logoGlow 3s ease-in-out infinite alternate,*/ float 16s ease-in-out infinite; /*TEMPORARY STOPPED TJE LOGGO FROM GLOWING*/
 }
 
 /* Floating animation - like objects gently moving up and down */
