@@ -14,13 +14,11 @@ body {
     margin-top: 15%;
     z-index: 10;
     position: relative;
-    /* Added floating animation */
     animation: float 4s ease-in-out infinite;
 }
 
 .main-logo {
     width: 200px;
-    /* Enhanced glow effects for main logo */
     animation: logoGlow 3s ease-in-out infinite alternate;
 }
 
@@ -95,18 +93,17 @@ p {
     background-color: #00ffcc;
     border-radius: 50%;
     opacity: 0;
-    animation: particleFloat 6s infinite linear;
 }
 
-.particle.fire {
-    animation: particleFloat 2s linear;
-}
+.particle:nth-child(1) { left: 10%; }
+.particle:nth-child(2) { left: 30%; }
+.particle:nth-child(3) { left: 50%; }
+.particle:nth-child(4) { left: 70%; }
+.particle:nth-child(5) { left: 90%; }
 
-.particle:nth-child(1) { animation-delay: 0s; left: 10%; }
-.particle:nth-child(2) { animation-delay: 1.2s; left: 30%; }
-.particle:nth-child(3) { animation-delay: 2.4s; left: 50%; }
-.particle:nth-child(4) { animation-delay: 3.6s; left: 70%; }
-.particle:nth-child(5) { animation-delay: 4.8s; left: 90%; }
+.particle.animate {
+            animation: particleFloat 5s linear;
+}
 
 @keyframes particleFloat {
     0% {
