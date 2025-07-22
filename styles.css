@@ -36,10 +36,10 @@ body {
 
 @keyframes logoGlow {
     0% {
-        filter: drop-shadow(0 0 10px #6a0dad);
+        filter: drop-shadow(0 0 0px #6a0dad);
     }
     100% {
-        filter: drop-shadow(0 0 25px #6a0dad) drop-shadow(0 0 35px #6a0dad);
+        filter: drop-shadow(0 0 15px #6a0dad) drop-shadow(0 0 25px #6a0dad);
     }
 }
 
