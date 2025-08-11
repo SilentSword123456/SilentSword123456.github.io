@@ -2,27 +2,739 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SilentLab</title>
+    <title>SilentLab - Problem Solver</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #000000 0%, #0a0a0a 50%, #000000 100%);
+            color: #00ffcc;
+            font-family: 'Courier New', monospace;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Navigation */
+        .nav-container {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 255, 204, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .nav-container.scrolled {
+            background: rgba(0, 0, 0, 0.95);
+            border-bottom-color: rgba(0, 255, 204, 0.5);
+        }
+
+        .nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .nav-item {
+            margin: 0 25px;
+            color: #00ffcc;
+            text-decoration: none;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover {
+            color: #ff00ff;
+            text-shadow: 0 0 10px #ff00ff;
+        }
+
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #00ffcc, #ff00ff);
+            transition: width 0.3s ease;
+        }
+
+        .nav-item:hover::after {
+            width: 100%;
+        }
+
+        /* Sections */
+        .section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 80px 20px;
+        }
+
+        /* Home Section */
+        .home-section {
+            text-align: center;
+        }
+
+        .main-logo {
+            width: 250px;
+            animation: float 16s ease-in-out infinite, logoGlow 3s ease-in-out infinite alternate;
+            margin-bottom: 30px;
+        }
+
+        .glitch-text {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            animation: textAnimate 12s ease-in-out infinite;
+        }
+
+        .subtitle {
+            font-size: 1.4rem;
+            text-shadow: 0 0 5px #00ffcc;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .mission-statement {
+            font-size: 1.1rem;
+            opacity: 0.7;
+            margin-bottom: 40px;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 15px 30px;
+            margin: 10px;
+            border: 2px solid #00ffcc;
+            color: #00ffcc;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            background: transparent;
+        }
+
+        .cta-button:hover {
+            color: #000;
+            box-shadow: 0 0 20px #00ffcc;
+        }
+
+        .cta-button.secondary {
+            border-color: #ff00ff;
+            color: #ff00ff;
+        }
+
+        .cta-button.secondary:hover {
+            box-shadow: 0 0 20px #ff00ff;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, #00ffcc, transparent);
+            transition: left 0.5s;
+        }
+
+        .cta-button.secondary::before {
+            background: linear-gradient(90deg, transparent, #ff00ff, transparent);
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        /* Services Section */
+        .services-section {
+            background: rgba(0, 20, 40, 0.3);
+            flex-direction: column;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            text-align: center;
+            background: linear-gradient(45deg, #00ffcc, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .services-intro {
+            text-align: center;
+            max-width: 800px;
+            margin-bottom: 50px;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            opacity: 0.8;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1000px;
+        }
+
+        .service-card {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .service-card:hover {
+            border-color: #ff00ff;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.2);
+            transform: translateY(-10px);
+        }
+
+        .service-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .service-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #00ffcc;
+        }
+
+        .service-desc {
+            opacity: 0.8;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        /* Challenge Section */
+        .challenge-section {
+            flex-direction: column;
+        }
+
+        .challenge-content {
+            max-width: 700px;
+            text-align: center;
+        }
+
+        .challenge-box {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #ff00ff;
+            padding: 40px;
+            margin: 30px 0;
+            text-align: center;
+            animation: pulse 2s infinite;
+        }
+
+        .challenge-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #ff00ff;
+        }
+
+        .challenge-text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 0, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 0, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 0, 255, 0); }
+        }
+
+        /* Portfolio Section */
+        .portfolio-section {
+            background: rgba(40, 0, 40, 0.3);
+            flex-direction: column;
+        }
+
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin-top: 40px;
+        }
+
+        .project-card {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            padding: 30px;
+            text-align: left;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .project-card:hover {
+            border-color: #ff00ff;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.2);
+            transform: translateY(-10px);
+        }
+
+        .project-status {
+            display: inline-block;
+            background: #00ffcc;
+            color: #000;
+            padding: 5px 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .project-status.learning {
+            background: #ff00ff;
+            color: #fff;
+        }
+
+        .project-title {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: #00ffcc;
+        }
+
+        .project-desc {
+            opacity: 0.8;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tech-tag {
+            background: rgba(0, 255, 204, 0.1);
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            padding: 5px 12px;
+            font-size: 0.8rem;
+            color: #00ffcc;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            background: rgba(0, 40, 20, 0.3);
+            flex-direction: column;
+        }
+
+        .contact-intro {
+            text-align: center;
+            max-width: 600px;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+
+        .contact-form {
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            color: #00ffcc;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #ff00ff;
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.3);
+        }
+
+        .form-input::placeholder {
+            color: rgba(0, 255, 204, 0.5);
+        }
+
+        .form-textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        /* Particle system */
+        .particle-trail {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background-color: #00ffcc;
+            border-radius: 50%;
+            opacity: 0;
+        }
+
+        .particle:nth-child(1) { left: 10%; }
+        .particle:nth-child(2) { left: 30%; }
+        .particle:nth-child(3) { left: 50%; }
+        .particle:nth-child(4) { left: 70%; }
+        .particle:nth-child(5) { left: 90%; }
+
+        .particle.animate {
+            animation: particleFloat 5s linear;
+        }
+
+        /* Background matrix effect */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.05;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes logoGlow {
+            0% { filter: drop-shadow(0 0 0px #6a0dad); }
+            100% { filter: drop-shadow(0 0 20px #6a0dad); }
+        }
+
+        @keyframes textAnimate {
+            0% { color: #00ffcc; text-shadow: 0 0 10px #00ffcc; }
+            25% { color: #0094fc; text-shadow: 0 0 20px #0094fc; }
+            50% { color: #821bef; text-shadow: 0 0 15px #821bef; }
+            75% { color: #ff00ff; text-shadow: 0 0 10px #ff00ff; }
+            100% { color: #00ffcc; text-shadow: 0 0 10px #00ffcc; }
+        }
+
+        @keyframes particleFloat {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 1; transform: translateY(90vh) scale(1); }
+            90% { opacity: 1; transform: translateY(10vh) scale(1); }
+            100% { transform: translateY(0vh) scale(0); opacity: 0; }
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .nav-item { margin: 0 15px; font-size: 12px; }
+            .glitch-text { font-size: 2rem; }
+            .section-title { font-size: 2rem; }
+            .main-logo { width: 180px; }
+            .services-grid { grid-template-columns: 1fr; }
+            .portfolio-grid { grid-template-columns: 1fr; }
+            .cta-button { margin: 5px; padding: 12px 20px; }
+            .challenge-box { padding: 25px; }
+        }
+    </style>
 </head>
 <body>
-<div class="main-content">
-    <img src="logo_nobg.png" alt="SilentLab Logo" class="main-logo">
-    <div class="main-text">
-        <h1>Welcome to SilentLab</h1>
-        <p>This is the beginning of something awesome.</p>
+    <!-- Matrix Background Effect -->
+    <canvas class="matrix-bg" id="matrix"></canvas>
+
+    <!-- Navigation -->
+    <nav class="nav-container" id="navbar">
+        <div class="nav">
+            <a href="#home" class="nav-item">Home</a>
+            <a href="#services" class="nav-item">Services</a>
+            <a href="#challenge" class="nav-item">Challenge Me</a>
+            <a href="#portfolio" class="nav-item">Portfolio</a>
+            <a href="#contact" class="nav-item">Contact</a>
+        </div>
+    </nav>
+
+    <!-- Home Section -->
+    <section id="home" class="section home-section">
+        <div>
+            <img src="logo_nobg.png" alt="SilentLab Logo" class="main-logo">
+            <h1 class="glitch-text">SilentLab</h1>
+            <p class="subtitle">Where Problems Meet Solutions</p>
+            <p class="mission-statement">
+                I'm a 15-year-old developer hungry for experience. Got a coding challenge? A bug that's driving you crazy? 
+                A project idea but no time to build it? I'll figure it out. Every problem is a learning opportunity.
+            </p>
+            <a href="#challenge" class="cta-button">Challenge Me</a>
+            <a href="#services" class="cta-button secondary">See Services</a>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="section services-section">
+        <h2 class="section-title">What I Can Help With</h2>
+        <div class="services-intro">
+            <p>I'm always looking for new challenges to expand my skills. Whether you need something built from scratch or just need help debugging, I'm here to learn and solve problems.</p>
+        </div>
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon">🌐</div>
+                <h3 class="service-title">Web Development</h3>
+                <p class="service-desc">HTML, CSS, JavaScript. From simple landing pages to interactive websites. I love making things look good and work smoothly.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🔧</div>
+                <h3 class="service-title">Problem Solving</h3>
+                <p class="service-desc">Got a bug? Code not working? I enjoy diving deep into problems and figuring out what's going wrong.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🎮</div>
+                <h3 class="service-title">Interactive Projects</h3>
+                <p class="service-desc">Simple games, animations, interactive elements. Anything that makes the web more fun and engaging.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🔮</div>
+                <h3 class="service-title">Automation & Tools</h3>
+                <p class="service-desc">Small utilities, calculators, converters, or anything that saves you time on repetitive tasks.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">📱</div>
+                <h3 class="service-title">Responsive Design</h3>
+                <p class="service-desc">Making sure your site looks great on phones, tablets, and desktops. Mobile-first approach.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">💡</div>
+                <h3 class="service-title">Learning Together</h3>
+                <p class="service-desc">New to coding? I can help explain concepts, review your code, or work through tutorials together.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Challenge Section -->
+    <section id="challenge" class="section challenge-section">
+        <div class="challenge-content">
+            <h2 class="section-title">Challenge Me</h2>
+            <div class="challenge-box">
+                <h3 class="challenge-title">Got a Problem?</h3>
+                <p class="challenge-text">
+                    I'm actively looking for projects to work on. Big or small, simple or complex - 
+                    if it involves code, I want to tackle it. Send me your challenge and let's see what we can build together!
+                </p>
+                <a href="#contact" class="cta-button">Send Your Challenge</a>
+            </div>
+            <p style="text-align: center; opacity: 0.7; margin-top: 30px;">
+                Every project is a chance to learn something new. I'm more interested in gaining experience than making money, 
+                so let's discuss what works for both of us!
+            </p>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="section portfolio-section">
+        <h2 class="section-title">Current Projects</h2>
+        <div class="portfolio-grid">
+            <div class="project-card">
+                <div class="project-status">Complete</div>
+                <h3 class="project-title">SilentLab Website</h3>
+                <p class="project-desc">This website! My first major project with animations, responsive design, and interactive elements. Built to showcase my skills and attract new challenges.</p>
+                <div class="tech-stack">
+                    <span class="tech-tag">HTML</span>
+                    <span class="tech-tag">CSS</span>
+                    <span class="tech-tag">JavaScript</span>
+                    <span class="tech-tag">Canvas</span>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-status learning">Learning</div>
+                <h3 class="project-title">JavaScript Experiments</h3>
+                <p class="project-desc">Collection of small interactive projects and animations. From particle systems to simple games, each one teaches me something new.</p>
+                <div class="tech-stack">
+                    <span class="tech-tag">JavaScript</span>
+                    <span class="tech-tag">Canvas</span>
+                    <span class="tech-tag">Web APIs</span>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-status learning">Next Up</div>
+                <h3 class="project-title">Your Project Here</h3>
+                <p class="project-desc">This could be your challenge! I'm looking for real projects to work on. Whether it's a website, tool, game, or something completely different.</p>
+                <div class="tech-stack">
+                    <span class="tech-tag">Your Choice</span>
+                    <span class="tech-tag">Let's Discuss</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section contact-section">
+        <h2 class="section-title">Let's Work Together</h2>
+        <div class="contact-intro">
+            <p>Ready to challenge me? Have a project idea? Just want to chat about code? 
+            Drop me a message and let's see what we can create together!</p>
+        </div>
+        <div class="contact-form">
+            <div class="form-group">
+                <input type="text" class="form-input" placeholder="Your Name" required>
+            </div>
+            <div class="form-group">
+                <input type="email" class="form-input" placeholder="Email Address" required>
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-input" placeholder="Project Type (Web, Tool, Game, etc.)" required>
+            </div>
+            <div class="form-group">
+                <textarea class="form-input form-textarea" placeholder="Describe your challenge or project idea..." required></textarea>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="cta-button">Send Challenge</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Particle System -->
+    <div class="particle-trail">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
     </div>
-</div>
 
-<div class="particle-trail">
-    <div class="particle"></div>
-    <div class="particle"></div>
-    <div class="particle"></div>
-    <div class="particle"></div>
-    <div class="particle"></div>
-</div>
+    <script>
+        // Matrix background effect
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
 
-<script src="script.js"></script>
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const matrixChars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#00ffcc';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = matrixChars.charAt(Math.floor(Math.random() * matrixChars.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 50);
+
+        // Particle animation (from original)
+        const particleStates = [false, false, false, false, false];
+
+        function animateParticle() {
+            const availableParticles = [];
+            for (let i = 0; i < 5; i++) {
+                if (!particleStates[i]) {
+                    availableParticles.push(i + 1);
+                }
+            }
+
+            if (availableParticles.length > 0) {
+                const randomIndex = Math.floor(Math.random() * availableParticles.length);
+                const particleNumber = availableParticles[randomIndex];
+                const particle = document.querySelector(`.particle:nth-child(${particleNumber})`);
+
+                if (particle) {
+                    particleStates[particleNumber - 1] = true;
+                    particle.classList.remove('animate');
+                    particle.offsetHeight;
+                    particle.classList.add('animate');
+
+                    setTimeout(() => {
+                        particleStates[particleNumber - 1] = false;
+                        particle.classList.remove('animate');
+                    }, 5000);
+                }
+            }
+        }
+
+        setTimeout(() => {
+            animateParticle();
+            setInterval(animateParticle, 2500);
+        }, 500);
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetSection = document.getElementById(targetId);
+                targetSection.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Form submission
+        document.querySelector('.contact-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Add form submission logic here
+            alert('Challenge received! I\'ll get back to you soon. (This is just a demo for now)');
+        });
+
+        // Interactive service cards
+        document.querySelectorAll('.service-card, .project-card').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px) scale(1.02)';
+            });
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    </script>
 </body>
 </html>
