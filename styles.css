@@ -11,6 +11,26 @@ body {
     cursor: none;
 }
 
+/* Animated Background Grid */
+.background-grid {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(0, 255, 204, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 204, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: gridMove 20s linear infinite;
+    z-index: -1;
+}
+
+@keyframes gridMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+}
+
 /* Custom Cursor */
 #cursor-trail {
     position: fixed;
@@ -287,6 +307,76 @@ body {
     margin-top: 15px;
     text-transform: uppercase;
     letter-spacing: 1px;
+}
+
+/* About Section Stats */
+.about-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 30px;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 20px;
+    background: rgba(255, 0, 255, 0.05);
+    border: 1px solid rgba(255, 0, 255, 0.2);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    min-width: 120px;
+}
+
+.stat-item:hover {
+    border-color: #ff00ff;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(255, 0, 255, 0.2);
+}
+
+.stat-number {
+    display: block;
+    font-size: 24px;
+    font-weight: bold;
+    color: #ff00ff;
+    text-shadow: 0 0 10px #ff00ff;
+}
+
+.stat-label {
+    display: block;
+    font-size: 12px;
+    color: #888;
+    margin-top: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Enhanced Project Cards */
+.project-status {
+    margin-top: 10px;
+    padding: 5px 10px;
+    background: rgba(0, 255, 204, 0.1);
+    border-radius: 15px;
+    font-size: 11px;
+    color: #00ffcc;
+    display: inline-block;
+}
+
+/* Collaboration Quote */
+.collaboration-quote {
+    margin-top: 30px;
+    padding: 20px;
+    background: rgba(0, 255, 204, 0.05);
+    border-left: 3px solid #00ffcc;
+    border-radius: 5px;
+    font-style: italic;
+    text-align: center;
+}
+
+.collaboration-quote p {
+    margin: 0;
+    color: #00ffcc;
+    text-shadow: 0 0 5px #00ffcc;
 }
 
 /* Contact Section */
