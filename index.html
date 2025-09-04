@@ -7,12 +7,117 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<!-- Interactive cursor trail -->
+<div id="cursor-trail"></div>
+
+<!-- Terminal Navigation -->
+<nav class="terminal-nav">
+    <div class="terminal-prompt">
+        <span class="prompt-text">silent@lab:~$</span>
+        <span class="nav-command" data-section="about">./about</span>
+        <span class="nav-command" data-section="skills">./skills</span>
+        <span class="nav-command" data-section="projects">./projects</span>
+        <span class="nav-command" data-section="collaborate">./collaborate</span>
+    </div>
+</nav>
+
 <div class="main-content">
     <img src="logo_nobg.png" alt="SilentLab Logo" class="main-logo">
     <div class="main-text">
         <h1>Welcome to SilentLab</h1>
-        <p>This is the beginning of something awesome.</p>
+        <p class="typing-text" data-text="15-year-old programmer ready to code the future..."></p>
     </div>
+</div>
+
+<!-- Interactive Content Sections -->
+<div class="content-sections">
+    <!-- About Section -->
+    <section id="about" class="content-section">
+        <div class="section-header">
+            <h2>$ whoami</h2>
+        </div>
+        <div class="section-content">
+            <p>Hi! I'm a 15-year-old programmer passionate about creating innovative solutions.</p>
+            <p>I love exploring new technologies, building projects, and collaborating with fellow developers.</p>
+            <p>Always ready to learn, share knowledge, and work on exciting projects together!</p>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="content-section">
+        <div class="section-header">
+            <h2>$ ls skills/</h2>
+        </div>
+        <div class="section-content">
+            <div class="skills-grid">
+                <div class="skill-item" data-skill="JavaScript">
+                    <div class="skill-icon">JS</div>
+                    <div class="skill-name">JavaScript</div>
+                    <div class="skill-bar"><div class="skill-progress" data-level="85"></div></div>
+                </div>
+                <div class="skill-item" data-skill="Python">
+                    <div class="skill-icon">PY</div>
+                    <div class="skill-name">Python</div>
+                    <div class="skill-bar"><div class="skill-progress" data-level="80"></div></div>
+                </div>
+                <div class="skill-item" data-skill="HTML/CSS">
+                    <div class="skill-icon">WEB</div>
+                    <div class="skill-name">HTML/CSS</div>
+                    <div class="skill-bar"><div class="skill-progress" data-level="90"></div></div>
+                </div>
+                <div class="skill-item" data-skill="Git">
+                    <div class="skill-icon">GIT</div>
+                    <div class="skill-name">Git</div>
+                    <div class="skill-bar"><div class="skill-progress" data-level="75"></div></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="content-section">
+        <div class="section-header">
+            <h2>$ cat projects.md</h2>
+        </div>
+        <div class="section-content">
+            <div class="project-grid">
+                <div class="project-card">
+                    <h3>SilentLab</h3>
+                    <p>Personal portfolio website with futuristic design</p>
+                    <div class="project-tech">HTML • CSS • JavaScript</div>
+                </div>
+                <div class="project-card">
+                    <h3>Coming Soon...</h3>
+                    <p>Exciting projects in development!</p>
+                    <div class="project-tech">Innovation in progress</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Collaborate Section -->
+    <section id="collaborate" class="content-section">
+        <div class="section-header">
+            <h2>$ ./connect.sh</h2>
+        </div>
+        <div class="section-content">
+            <p>Ready to collaborate on something awesome? Let's build the future together!</p>
+            <div class="contact-methods">
+                <div class="contact-item" data-contact="github">
+                    <div class="contact-icon">{ }</div>
+                    <span>GitHub: @SilentSword123456</span>
+                </div>
+                <div class="contact-item" data-contact="email">
+                    <div class="contact-icon">@</div>
+                    <span>Open to collaboration</span>
+                </div>
+                <div class="contact-item" data-contact="projects">
+                    <div class="contact-icon">+</div>
+                    <span>Always looking for new projects</span>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 
 <div class="particle-trail">

@@ -7,21 +7,88 @@ body {
     padding: 0;
     overflow-x: hidden;
     position: relative;
-    height: 100vh;
+    min-height: 100vh;
+    cursor: none;
+}
+
+/* Custom Cursor */
+#cursor-trail {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #00ffcc;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    mix-blend-mode: difference;
+    transition: transform 0.1s ease;
+}
+
+/* Terminal Navigation */
+.terminal-nav {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: rgba(0, 20, 20, 0.9);
+    border: 1px solid #00ffcc;
+    border-radius: 5px;
+    padding: 10px 15px;
+    font-size: 14px;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+}
+
+.terminal-prompt {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.prompt-text {
+    color: #00ffcc;
+    margin-right: 10px;
+}
+
+.nav-command {
+    color: #888;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 5px 8px;
+    border-radius: 3px;
+    position: relative;
+}
+
+.nav-command:hover {
+    color: #00ffcc;
+    background: rgba(0, 255, 204, 0.1);
+    text-shadow: 0 0 10px #00ffcc;
+}
+
+.nav-command.active {
+    color: #ff00ff;
+    text-shadow: 0 0 10px #ff00ff;
 }
 
 .main-content {
-    margin-top: 15%;
+    margin-top: 10%;
     z-index: 10;
     position: relative;
-    /*animation: float 4s ease-in-out infinite;*/
+    padding-bottom: 50px;
 }
 
-.main-text {}
+.main-text {
+    margin-top: 30px;
+}
 
 .main-logo {
     width: 200px;
-    animation: /*logoGlow 3s ease-in-out infinite alternate,*/ float 16s ease-in-out infinite; /*TEMPORARY STOPPED TJE LOGGO FROM GLOWING*/
+    animation: logoGlow 3s ease-in-out infinite alternate, float 16s ease-in-out infinite;
+    transition: transform 0.3s ease;
+}
+
+.main-logo:hover {
+    transform: scale(1.1);
 }
 
 /* Floating animation - like objects gently moving up and down */
@@ -39,8 +106,226 @@ body {
         filter: drop-shadow(0 0 0px #6a0dad);
     }
     100% {
-        filter: drop-shadow(0 0 4px #6a0dad) drop-shadow(0 0 4px #6a0dad);
+        filter: drop-shadow(0 0 20px #00ffcc) drop-shadow(0 0 40px #00ffcc);
     }
+}
+
+/* Typing Effect */
+.typing-text {
+    font-size: 18px;
+    color: #888;
+    min-height: 25px;
+    display: inline-block;
+}
+
+.typing-text::after {
+    content: '_';
+    animation: blink 1s infinite;
+    color: #00ffcc;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+/* Content Sections */
+.content-sections {
+    max-width: 1200px;
+    margin: 50px auto 0;
+    padding: 0 20px;
+}
+
+.content-section {
+    margin: 40px 0;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.6s ease;
+    background: rgba(0, 20, 20, 0.3);
+    border: 1px solid rgba(0, 255, 204, 0.2);
+    border-radius: 10px;
+    padding: 30px;
+    backdrop-filter: blur(5px);
+}
+
+.content-section.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.section-header h2 {
+    color: #00ffcc;
+    margin-bottom: 20px;
+    text-align: left;
+    font-size: 24px;
+    text-shadow: 0 0 10px #00ffcc;
+}
+
+.section-content {
+    text-align: left;
+    line-height: 1.6;
+}
+
+.section-content p {
+    margin: 15px 0;
+    color: #ccc;
+}
+
+/* Skills Section */
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.skill-item {
+    background: rgba(0, 255, 204, 0.05);
+    border: 1px solid rgba(0, 255, 204, 0.2);
+    border-radius: 8px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.skill-item:hover {
+    border-color: #00ffcc;
+    background: rgba(0, 255, 204, 0.1);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 255, 204, 0.2);
+}
+
+.skill-icon {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ff00ff;
+    margin-bottom: 10px;
+    text-shadow: 0 0 10px #ff00ff;
+}
+
+.skill-name {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #00ffcc;
+}
+
+.skill-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.skill-progress {
+    height: 100%;
+    background: linear-gradient(90deg, #00ffcc, #ff00ff);
+    border-radius: 4px;
+    width: 0%;
+    transition: width 2s ease;
+    box-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+}
+
+.skill-item:hover .skill-progress {
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 204, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(0, 255, 204, 0.8); }
+}
+
+/* Projects Section */
+.project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.project-card {
+    background: rgba(0, 255, 204, 0.05);
+    border: 1px solid rgba(0, 255, 204, 0.2);
+    border-radius: 8px;
+    padding: 25px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.project-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 204, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.project-card:hover::before {
+    left: 100%;
+}
+
+.project-card:hover {
+    border-color: #00ffcc;
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 255, 204, 0.2);
+}
+
+.project-card h3 {
+    color: #ff00ff;
+    margin-bottom: 10px;
+    text-shadow: 0 0 10px #ff00ff;
+}
+
+.project-tech {
+    color: #888;
+    font-size: 12px;
+    margin-top: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Contact Section */
+.contact-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: rgba(0, 255, 204, 0.05);
+    border: 1px solid rgba(0, 255, 204, 0.2);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.contact-item:hover {
+    border-color: #00ffcc;
+    background: rgba(0, 255, 204, 0.1);
+    transform: translateX(10px);
+}
+
+.contact-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 0, 255, 0.2);
+    border-radius: 50%;
+    color: #ff00ff;
+    font-weight: bold;
+    text-shadow: 0 0 10px #ff00ff;
 }
 
 /* Text glow animation */
@@ -124,4 +409,85 @@ p {
         transform: translateY(0vh) scale(0);
         opacity: 0;
     }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .terminal-nav {
+        position: static;
+        margin: 20px;
+        text-align: center;
+    }
+    
+    .terminal-prompt {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .main-content {
+        margin-top: 5%;
+    }
+    
+    .main-logo {
+        width: 150px;
+    }
+    
+    .skills-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .project-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .content-section {
+        padding: 20px;
+        margin: 20px 10px;
+    }
+    
+    .section-header h2 {
+        font-size: 20px;
+        text-align: center;
+    }
+    
+    .section-content {
+        text-align: center;
+    }
+    
+    body {
+        cursor: default;
+    }
+    
+    #cursor-trail {
+        display: none;
+    }
+}
+
+/* Additional animations */
+@keyframes glitch {
+    0%, 100% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+}
+
+.glitch:hover {
+    animation: glitch 0.3s;
+}
+
+/* Scroll reveal animation */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-in {
+    animation: slideInUp 0.6s ease forwards;
 }
