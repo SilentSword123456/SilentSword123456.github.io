@@ -1,0 +1,27 @@
+{
+  "id": "collaborate",
+  "command": "./collaborate",
+  "title": "$ ./connect.sh",
+  "content": {
+    "description": "Ready to collaborate on something awesome? Let's build the future together!",
+    "contacts": [
+      {
+        "type": "github",
+        "icon": "{ }",
+        "text": "GitHub: @SilentSword123456",
+        "url": "https://github.com/SilentSword123456"
+      },
+      {
+        "type": "email",
+        "icon": "@",
+        "text": "Open to collaboration"
+      },
+      {
+        "type": "projects",
+        "icon": "+",
+        "text": "Always looking for new projects"
+      }
+    ],
+    "quote": "\"The best way to predict the future is to code it.\" 💻"
+  }
+}

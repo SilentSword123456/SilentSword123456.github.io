@@ -1,0 +1,21 @@
+{
+  "id": "projects",
+  "command": "./projects",
+  "title": "$ cat projects.md",
+  "content": {
+    "projects": [
+      {
+        "name": "SilentLab",
+        "description": "Personal portfolio website with futuristic design and interactive elements",
+        "technologies": ["HTML", "CSS", "JavaScript"],
+        "status": "✨ Enhanced"
+      },
+      {
+        "name": "Future Projects",
+        "description": "Exciting coding adventures waiting to be built!",
+        "technologies": ["Innovation", "Collaboration", "Learning"],
+        "status": "🚀 Planning"
+      }
+    ]
+  }
+}

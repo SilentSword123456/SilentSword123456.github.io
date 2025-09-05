@@ -1,0 +1,26 @@
+{
+  "id": "about",
+  "command": "./about",
+  "title": "$ whoami",
+  "content": {
+    "description": [
+      "Hi! I'm a 15-year-old programmer passionate about creating innovative solutions.",
+      "I love exploring new technologies, building projects, and collaborating with fellow developers.",
+      "Always ready to learn, share knowledge, and work on exciting projects together!"
+    ],
+    "stats": [
+      {
+        "number": "15",
+        "label": "Years Old"
+      },
+      {
+        "number": "∞",
+        "label": "Passion Level"
+      },
+      {
+        "number": "24/7",
+        "label": "Ready to Code"
+      }
+    ]
+  }
+}

@@ -8,7 +8,6 @@ body {
     overflow-x: hidden;
     position: relative;
     min-height: 100vh;
-    cursor: none;
 }
 
 /* Animated Background Grid */
@@ -31,19 +30,6 @@ body {
     100% { transform: translate(50px, 50px); }
 }
 
-/* Custom Cursor */
-#cursor-trail {
-    position: fixed;
-    width: 20px;
-    height: 20px;
-    border: 2px solid #00ffcc;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9999;
-    mix-blend-mode: difference;
-    transition: transform 0.1s ease;
-}
-
 /* Terminal Navigation */
 .terminal-nav {
     position: fixed;
@@ -62,6 +48,12 @@ body {
     display: flex;
     gap: 15px;
     align-items: center;
+    flex-wrap: wrap;
+}
+
+#nav-commands {
+    display: flex;
+    gap: 15px;
     flex-wrap: wrap;
 }
 

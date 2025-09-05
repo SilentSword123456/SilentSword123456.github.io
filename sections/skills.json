@@ -1,0 +1,29 @@
+{
+  "id": "skills",
+  "command": "./skills",
+  "title": "$ ls skills/",
+  "content": {
+    "skills": [
+      {
+        "name": "JavaScript",
+        "icon": "JS",
+        "level": 85
+      },
+      {
+        "name": "Python",
+        "icon": "PY",
+        "level": 80
+      },
+      {
+        "name": "HTML/CSS",
+        "icon": "WEB",
+        "level": 90
+      },
+      {
+        "name": "Git",
+        "icon": "GIT",
+        "level": 75
+      }
+    ]
+  }
+}
