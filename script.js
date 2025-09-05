@@ -407,7 +407,130 @@ class SilentLabCMS {
     }
 }
 
-// Initialize the CMS when the page loads
+// Custom Cursor Effect System
+class CursorEffect {
+    constructor() {
+        this.cursorGlow = null;
+        this.circuitLines = [];
+        this.lastMoveTime = 0;
+        this.init();
+    }
+
+    init() {
+        this.createCursorGlow();
+        this.setupMouseTracking();
+    }
+
+    createCursorGlow() {
+        this.cursorGlow = document.createElement('div');
+        this.cursorGlow.className = 'cursor-glow';
+        document.body.appendChild(this.cursorGlow);
+    }
+
+    setupMouseTracking() {
+        let mouseX = 0, mouseY = 0;
+        
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            // Update cursor glow position
+            this.cursorGlow.style.left = mouseX + 'px';
+            this.cursorGlow.style.top = mouseY + 'px';
+            
+            // Create circuit lines occasionally
+            const now = Date.now();
+            if (now - this.lastMoveTime > 150) {
+                this.createCircuitLine(mouseX, mouseY);
+                this.lastMoveTime = now;
+            }
+        });
+
+        // Enhanced effects on click
+        document.addEventListener('click', (e) => {
+            this.createClickEffect(e.clientX, e.clientY);
+        });
+    }
+
+    createCircuitLine(x, y) {
+        const directions = ['horizontal', 'vertical'];
+        const direction = directions[Math.floor(Math.random() * directions.length)];
+        
+        const line = document.createElement('div');
+        line.className = `circuit-line ${direction === 'vertical' ? 'vertical' : ''}`;
+        
+        if (direction === 'horizontal') {
+            line.style.left = (x - 40) + 'px';
+            line.style.top = y + 'px';
+        } else {
+            line.style.left = x + 'px';
+            line.style.top = (y - 40) + 'px';
+        }
+        
+        document.body.appendChild(line);
+        
+        // Trigger animation
+        setTimeout(() => line.classList.add('active'), 10);
+        
+        // Remove after animation
+        setTimeout(() => {
+            line.remove();
+        }, 1500);
+    }
+
+    createClickEffect(x, y) {
+        // Create multiple circuit lines on click
+        for (let i = 0; i < 4; i++) {
+            setTimeout(() => {
+                this.createCircuitLine(x + (Math.random() - 0.5) * 100, y + (Math.random() - 0.5) * 100);
+            }, i * 100);
+        }
+        
+        // Create a pulse effect
+        const pulse = document.createElement('div');
+        pulse.style.cssText = `
+            position: fixed;
+            left: ${x}px;
+            top: ${y}px;
+            width: 4px;
+            height: 4px;
+            background: #00ffcc;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 9999;
+            animation: click-pulse 0.6s ease-out forwards;
+        `;
+        
+        // Add click pulse animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes click-pulse {
+                0% { 
+                    transform: translate(-50%, -50%) scale(1);
+                    opacity: 1;
+                    box-shadow: 0 0 0 0 rgba(0, 255, 204, 0.7);
+                }
+                100% { 
+                    transform: translate(-50%, -50%) scale(15);
+                    opacity: 0;
+                    box-shadow: 0 0 0 10px rgba(0, 255, 204, 0);
+                }
+            }
+        `;
+        
+        if (!document.querySelector('#click-pulse-styles')) {
+            style.id = 'click-pulse-styles';
+            document.head.appendChild(style);
+        }
+        
+        document.body.appendChild(pulse);
+        setTimeout(() => pulse.remove(), 600);
+    }
+}
+
+// Initialize the CMS and cursor effect when the page loads
 document.addEventListener('DOMContentLoaded', () => {
     new SilentLabCMS();
+    new CursorEffect();
 });
