@@ -23,25 +23,52 @@ export default {
 
         if (request.method === 'OPTIONS') return new Response(null, { headers: CORS })
 
+        // GET /projects — public, images inlined from KV
         if (request.method === 'GET' && path === '/projects') {
             const raw = await env.PROJECTS_KV.get('projects')
-            return json(raw ? JSON.parse(raw) : getDefaults())
+            const projects = raw ? JSON.parse(raw) : getDefaults()
+
+            // Attach stored images
+            const withImages = await Promise.all(projects.map(async p => {
+                if (p.image && p.image.startsWith('kv:')) {
+                    const imgData = await env.PROJECTS_KV.get(`img:${p.id}`)
+                    return { ...p, image: imgData || '' }
+                }
+                return p
+            }))
+            return json(withImages)
         }
 
+        // PUT /projects — admin only
         if (request.method === 'PUT' && path === '/projects') {
             if (!isAdmin(request, env)) return err('Unauthorized', 401)
             const projects = await request.json()
             if (!Array.isArray(projects)) return err('Expected array')
-            await env.PROJECTS_KV.put('projects', JSON.stringify(projects))
-            return json({ ok: true, count: projects.length })
+
+            // Separate out base64 images into their own KV keys to keep the
+            // projects list lean (KV values have a 25 MB limit per value).
+            const stripped = await Promise.all(projects.map(async p => {
+                if (p.image && p.image.startsWith('data:')) {
+                    await env.PROJECTS_KV.put(`img:${p.id}`, p.image)
+                    return { ...p, image: 'kv:' + p.id }
+                }
+                // If image was already stored as kv: reference, keep it
+                return p
+            }))
+
+            await env.PROJECTS_KV.put('projects', JSON.stringify(stripped))
+            return json({ ok: true, count: stripped.length })
         }
 
+        // DELETE /projects/:id — admin only
         if (request.method === 'DELETE' && path.startsWith('/projects/')) {
             if (!isAdmin(request, env)) return err('Unauthorized', 401)
             const id = path.split('/')[2]
             const raw = await env.PROJECTS_KV.get('projects')
             const projects = raw ? JSON.parse(raw) : []
             await env.PROJECTS_KV.put('projects', JSON.stringify(projects.filter(p => p.id !== id)))
+            // Clean up image if stored
+            await env.PROJECTS_KV.delete(`img:${id}`)
             return json({ ok: true })
         }
 
