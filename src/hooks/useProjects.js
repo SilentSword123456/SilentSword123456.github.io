@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 
 // Replace after you deploy the worker
-const WORKER_URL = 'https://silentlab-api.YOUR_SUBDOMAIN.workers.dev'
+const WORKER_URL = 'https://silentlab-api.andrei925-dumitru.workers.dev'
 
 export function useProjects() {
     const [projects, setProjects] = useState([])
