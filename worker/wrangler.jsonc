@@ -1,14 +1,16 @@
 {
-  "name": "silentlab-api",
-  "main": "index.js",
-  "compatibility_date": "2024-01-01",
-  "kv_namespaces": [
-    {
-      "binding": "PROJECTS_KV",
-      "id": "8c588e47bbd14eb5908409360930fb84"
-    }
-  ],
-  "triggers": {
-    "crons": ["*/5 * * * *"]
-  }
+	"name": "silentlab-api",
+	"main": "index.js",
+	"compatibility_date": "2024-01-01",
+	"kv_namespaces": [
+		{
+			"binding": "PROJECTS_KV",
+			"id": "8c588e47bbd14eb5908409360930fb84"
+		}
+	],
+	"triggers": {
+		"crons": [
+			"*/5 * * * *"
+		]
+	}
 }

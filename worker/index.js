@@ -1,7 +1,7 @@
 const CORS = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, X-Admin-Key',
+    'Access-Control-Allow-Headers': 'Content-Type',
 }
 
 function json(data, status = 200) {
@@ -12,15 +12,12 @@ function json(data, status = 200) {
 function err(msg, status = 400) {
     return new Response(msg, { status, headers: CORS })
 }
-function isAdmin(request, env) {
+function isAdmin(request) {
     // Cloudflare Access sets this header after authenticating the user.
-    // The Cf-Access-Authenticated-User-Email header is signed by Cloudflare
-    // and cannot be spoofed from outside — no password needed.
-    const email = request.headers.get('Cf-Access-Authenticated-User-Email')
-    if (email) return true
+    // It is cryptographically signed by Cloudflare and cannot be spoofed.
+    return !!request.headers.get('Cf-Access-Authenticated-User-Email')
 }
 
-// Ping a URL and return 'up' | 'down'
 async function pingUrl(url) {
     try {
         const res = await fetch(url, {
@@ -47,21 +44,19 @@ export default {
             const projects = raw ? JSON.parse(raw) : getDefaults()
 
             const withData = await Promise.all(projects.map(async p => {
-                // Attach stored image
                 if (p.image && p.image.startsWith('kv:')) {
                     const imgData = await env.PROJECTS_KV.get(`img:${p.id}`)
                     p = { ...p, image: imgData || '' }
                 }
-                // Attach cached ping result
                 const ping = await env.PROJECTS_KV.get(`ping:${p.id}`)
                 return { ...p, pingStatus: ping || 'unknown' }
             }))
             return json(withData)
         }
 
-        // GET /ping/:id — trigger a fresh ping for one project (admin only)
+        // GET /ping/:id — admin only
         if (request.method === 'GET' && path.startsWith('/ping/')) {
-            if (!isAdmin(request, env)) return err('Unauthorized', 401)
+            if (!isAdmin(request)) return err('Unauthorized', 401)
             const id = path.split('/')[2]
             const raw = await env.PROJECTS_KV.get('projects')
             const projects = raw ? JSON.parse(raw) : getDefaults()
@@ -69,13 +64,13 @@ export default {
             if (!project) return err('Not found', 404)
             if (!project.pingUrl) return json({ pingStatus: 'unknown' })
             const status = await pingUrl(project.pingUrl)
-            await env.PROJECTS_KV.put(`ping:${id}`, status, { expirationTtl: 300 }) // cache 5 min
+            await env.PROJECTS_KV.put(`ping:${id}`, status, { expirationTtl: 300 })
             return json({ pingStatus: status })
         }
 
         // PUT /projects — admin only
         if (request.method === 'PUT' && path === '/projects') {
-            if (!isAdmin(request, env)) return err('Unauthorized', 401)
+            if (!isAdmin(request)) return err('Unauthorized', 401)
             const projects = await request.json()
             if (!Array.isArray(projects)) return err('Expected array')
 
@@ -93,7 +88,7 @@ export default {
 
         // DELETE /projects/:id — admin only
         if (request.method === 'DELETE' && path.startsWith('/projects/')) {
-            if (!isAdmin(request, env)) return err('Unauthorized', 401)
+            if (!isAdmin(request)) return err('Unauthorized', 401)
             const id = path.split('/')[2]
             const raw = await env.PROJECTS_KV.get('projects')
             const projects = raw ? JSON.parse(raw) : []
@@ -106,7 +101,6 @@ export default {
         return err('Not found', 404)
     },
 
-    // Cron: ping all projects every 5 minutes
     async scheduled(event, env) {
         const raw = await env.PROJECTS_KV.get('projects')
         if (!raw) return

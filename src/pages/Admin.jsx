@@ -34,11 +34,6 @@ export default function Admin() {
   const [pinging, setPinging] = useState({})
   const { projects, loading, setProjects } = useProjects()
 
-  // No login needed — Cloudflare Access handles authentication before
-  // the page even loads. The worker trusts Cf-Access-Authenticated-User-Email.
-  // For local dev, set ADMIN_KEY in .dev.vars and pass it via X-Admin-Key.
-  const adminKey = import.meta.env.VITE_ADMIN_KEY || ''
-
   function handleChange(e) {
     const { name, value, type, checked } = e.target
     setForm(f => ({ ...f, [name]: type === 'checkbox' ? checked : value }))
