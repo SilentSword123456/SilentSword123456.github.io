@@ -104,3 +104,49 @@
 .muted { font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--muted); letter-spacing: 0.15em; }
 
 @media (max-width: 600px) { .row { grid-template-columns: 1fr; } }
+/* ── Image upload ── */
+.imageArea { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.imageDropZone {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 0.4rem; padding: 2rem 1.5rem;
+  border: 1px dashed var(--border); border-radius: 4px;
+  cursor: pointer; transition: border-color 0.2s, background 0.2s;
+  background: rgba(0,255,204,0.02);
+}
+.imageDropZone:hover { border-color: var(--cyan); background: rgba(0,255,204,0.05); }
+
+.imageDropText {
+  font-family: 'Share Tech Mono', monospace; font-size: 0.75rem;
+  color: var(--text); letter-spacing: 0.1em;
+}
+.imageDropHint {
+  font-family: 'Share Tech Mono', monospace; font-size: 0.6rem;
+  color: var(--muted); letter-spacing: 0.1em;
+}
+
+.imagePreviewWrap { display: flex; align-items: center; gap: 1rem; }
+.imagePreview {
+  width: 80px; height: 80px; object-fit: cover;
+  border-radius: 4px; border: 1px solid var(--border);
+}
+
+/* ── Edit state ── */
+.listItemEditing { border-color: var(--cyan) !important; background: rgba(0,255,204,0.04) !important; }
+
+.listInfo { display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.75rem; }
+.listMeta { flex: 1; min-width: 0; }
+.listInfoRow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.4rem; flex-wrap: wrap; }
+
+.listThumb {
+  width: 52px; height: 52px; object-fit: cover;
+  border-radius: 4px; border: 1px solid var(--border); flex-shrink: 0;
+}
+
+/* ── Form actions row ── */
+.formActions { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+.btnCancel {
+  background: transparent !important; color: var(--muted) !important;
+  border: 1px solid var(--border) !important;
+}
+.btnCancel:hover { color: var(--text) !important; border-color: var(--text) !important; }

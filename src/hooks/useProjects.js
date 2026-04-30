@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 
-// Replace after you deploy the worker
 const WORKER_URL = 'https://silentlab-api.andrei925-dumitru.workers.dev'
 
 export function useProjects() {
@@ -18,20 +17,19 @@ export function useProjects() {
     return { projects, loading, error, setProjects }
 }
 
-export async function saveProjects(projects, adminKey) {
+export async function saveProjects(projects) {
     const res = await fetch(`${WORKER_URL}/projects`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminKey },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(projects),
     })
     if (!res.ok) throw new Error(await res.text())
     return res.json()
 }
 
-export async function deleteProject(id, adminKey) {
+export async function deleteProject(id) {
     const res = await fetch(`${WORKER_URL}/projects/${id}`, {
         method: 'DELETE',
-        headers: { 'X-Admin-Key': adminKey },
     })
     if (!res.ok) throw new Error(await res.text())
     return res.json()
