@@ -1,0 +1,95 @@
+:root {
+    --cyan: #00ffcc;
+    --purple: #821bef;
+    --green: #39ff14;
+    --dark: #000000;
+    --surface: #0a0a0a;
+    --surface2: #111111;
+    --border: rgba(0,255,204,0.12);
+    --text: #c8f0e8;
+    --muted: rgba(200,240,232,0.45);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: crosshair;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+            linear-gradient(rgba(0,255,204,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,255,204,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+            0deg, transparent, transparent 2px,
+            rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 999;
+}
+
+a { text-decoration: none; color: inherit; }
+
+input, textarea, select {
+    font-family: 'Share Tech Mono', monospace;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 3px;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+}
+
+input:focus, textarea:focus, select:focus {
+    border-color: rgba(0,255,204,0.5);
+}
+
+button { cursor: pointer; font-family: 'Share Tech Mono', monospace; letter-spacing: 0.1em; }
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes floatLogo {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+}
+@keyframes pulseGlow {
+    0%, 100% { opacity: 1; transform: translate(-50%, -55%) scale(1); }
+    50% { opacity: 0.6; transform: translate(-50%, -55%) scale(1.1); }
+}
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+@keyframes ptRise {
+    0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+    5% { opacity: 0.6; }
+    95% { opacity: 0.3; }
+    100% { transform: translateY(-10vh) translateX(var(--drift)); opacity: 0; }
+}
+@keyframes scrollPulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+}
