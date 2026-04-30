@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-const WORKER_URL = 'https://silentlab-api.andrei925-dumitru.workers.dev'
+const WORKER_URL = 'https://api.silentlab.work'
 
 export function useProjects() {
     const [projects, setProjects] = useState([])
