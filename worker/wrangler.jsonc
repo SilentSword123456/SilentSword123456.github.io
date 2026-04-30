@@ -7,5 +7,8 @@
       "binding": "PROJECTS_KV",
       "id": "8c588e47bbd14eb5908409360930fb84"
     }
-  ]
+  ],
+  "triggers": {
+    "crons": ["*/5 * * * *"]
+  }
 }

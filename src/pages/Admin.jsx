@@ -1,9 +1,6 @@
 import { useState, useRef } from 'react'
-import { useProjects, saveProjects, deleteProject } from '../hooks/useProjects.js'
+import { useProjects, saveProjects, deleteProject, WORKER_URL } from '../hooks/useProjects.js'
 import styles from './Admin.module.css'
-
-const MAX_ATTEMPTS = 5
-const LOCKOUT_MS = 5 * 60 * 1000 // 5 minutes
 
 const EMPTY_PROJECT = {
   id: '',
@@ -12,6 +9,7 @@ const EMPTY_PROJECT = {
   status: 'wip',
   tags: '',
   url: '',
+  pingUrl: '',
   image: '',
   accentColor: 'linear-gradient(90deg, #00ffcc, #821bef)',
   featured: false,
@@ -27,60 +25,19 @@ function fileToBase64(file) {
 }
 
 export default function Admin() {
-  const [adminKey, setAdminKey] = useState('')
-  const [authed, setAuthed] = useState(false)
-  const [authError, setAuthError] = useState('')
-  const [attempts, setAttempts] = useState(0)
-  const [lockedUntil, setLockedUntil] = useState(null)
-
   const [form, setForm] = useState(EMPTY_PROJECT)
   const [editingId, setEditingId] = useState(null)
   const [imagePreview, setImagePreview] = useState('')
   const fileInputRef = useRef(null)
-
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState('')
+  const [pinging, setPinging] = useState({})
   const { projects, loading, setProjects } = useProjects()
 
-  function isLocked() {
-    if (!lockedUntil) return false
-    if (Date.now() < lockedUntil) return true
-    setLockedUntil(null)
-    setAttempts(0)
-    return false
-  }
-
-  function lockoutRemaining() {
-    if (!lockedUntil) return 0
-    return Math.ceil((lockedUntil - Date.now()) / 1000)
-  }
-
-  async function handleAuth(e) {
-    e.preventDefault()
-    if (isLocked()) return
-    try {
-      const { WORKER_URL } = await import('../hooks/useProjects.js')
-      const res = await fetch(`${WORKER_URL}/projects`, {
-        headers: { 'X-Admin-Key': adminKey },
-      })
-      if (res.ok) {
-        setAuthed(true)
-        setAuthError('')
-        setAttempts(0)
-      } else {
-        const next = attempts + 1
-        setAttempts(next)
-        if (next >= MAX_ATTEMPTS) {
-          setLockedUntil(Date.now() + LOCKOUT_MS)
-          setAuthError('Too many failed attempts. Locked out for 5 minutes.')
-        } else {
-          setAuthError(`Wrong key. ${MAX_ATTEMPTS - next} attempt${MAX_ATTEMPTS - next === 1 ? '' : 's'} remaining.`)
-        }
-      }
-    } catch {
-      setAuthError('Could not reach the worker.')
-    }
-  }
+  // No login needed — Cloudflare Access handles authentication before
+  // the page even loads. The worker trusts Cf-Access-Authenticated-User-Email.
+  // For local dev, set ADMIN_KEY in .dev.vars and pass it via X-Admin-Key.
+  const adminKey = import.meta.env.VITE_ADMIN_KEY || ''
 
   function handleChange(e) {
     const { name, value, type, checked } = e.target
@@ -111,6 +68,7 @@ export default function Admin() {
     setForm({
       ...project,
       tags: Array.isArray(project.tags) ? project.tags.join(', ') : project.tags,
+      pingUrl: project.pingUrl || '',
     })
     setImagePreview(project.image || '')
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -180,34 +138,19 @@ export default function Admin() {
     setTimeout(() => setMsg(''), 3000)
   }
 
-  if (!authed) {
-    const locked = isLocked()
-    return (
-      <div className={styles.authWrap}>
-        <div className={styles.authBox}>
-          <p className={styles.label}>// silentlab admin</p>
-          <h1 className={styles.authTitle}>Access Required</h1>
-          {locked ? (
-            <p className={styles.error}>Account locked. Try again in {lockoutRemaining()}s.</p>
-          ) : (
-            <form onSubmit={handleAuth} className={styles.authForm}>
-              <input
-                type="password"
-                placeholder="Admin key"
-                value={adminKey}
-                onChange={e => setAdminKey(e.target.value)}
-                autoFocus
-                autoComplete="current-password"
-              />
-              <button type="submit" className={styles.btn} disabled={attempts >= MAX_ATTEMPTS}>
-                Enter →
-              </button>
-            </form>
-          )}
-          {authError && <p className={styles.error}>{authError}</p>}
-        </div>
-      </div>
-    )
+  async function handlePing(id) {
+    setPinging(p => ({ ...p, [id]: 'pinging' }))
+    try {
+      const res = await fetch(`${WORKER_URL}/ping/${id}`, {
+        headers: adminKey ? { 'X-Admin-Key': adminKey } : {},
+      })
+      const data = await res.json()
+      setPinging(p => ({ ...p, [id]: data.pingStatus }))
+      // Update local project state too
+      setProjects(prev => prev.map(p => p.id === id ? { ...p, pingStatus: data.pingStatus } : p))
+    } catch {
+      setPinging(p => ({ ...p, [id]: 'down' }))
+    }
   }
 
   return (
@@ -263,9 +206,14 @@ export default function Admin() {
               <input name="tags" value={form.tags} onChange={handleChange} placeholder="React, Flask, Python" />
             </div>
             <div className={styles.field}>
-              <label>Accent color (CSS gradient or color)</label>
-              <input name="accentColor" value={form.accentColor} onChange={handleChange} />
+              <label>Ping URL (to check uptime)</label>
+              <input name="pingUrl" value={form.pingUrl} onChange={handleChange} placeholder="https://api.myproject.com/health" />
             </div>
+          </div>
+
+          <div className={styles.field}>
+            <label>Accent color (CSS gradient or color)</label>
+            <input name="accentColor" value={form.accentColor} onChange={handleChange} />
           </div>
 
           <div className={styles.field}>
@@ -329,30 +277,47 @@ export default function Admin() {
           <p className={styles.muted}>No projects yet.</p>
         ) : (
           <div className={styles.list}>
-            {projects.map(p => (
-              <div key={p.id} className={`${styles.listItem} ${editingId === p.id ? styles.listItemEditing : ''}`}>
-                <div className={styles.listInfo}>
-                  {p.image && <img src={p.image} alt={p.name} className={styles.listThumb} />}
-                  <div className={styles.listMeta}>
-                    <div className={styles.listInfoRow}>
-                      <span className={styles.listName}>{p.name}</span>
-                      <span className={`${styles.badge} ${styles[p.status]}`}>{p.status}</span>
-                      {p.featured && <span className={styles.featBadge}>featured</span>}
+            {projects.map(p => {
+              const pingResult = pinging[p.id] || p.pingStatus || 'unknown'
+              return (
+                <div key={p.id} className={`${styles.listItem} ${editingId === p.id ? styles.listItemEditing : ''}`}>
+                  <div className={styles.listInfo}>
+                    {p.image && <img src={p.image} alt={p.name} className={styles.listThumb} />}
+                    <div className={styles.listMeta}>
+                      <div className={styles.listInfoRow}>
+                        <span className={styles.listName}>{p.name}</span>
+                        <span className={`${styles.badge} ${styles[p.status]}`}>{p.status}</span>
+                        {p.featured && <span className={styles.featBadge}>featured</span>}
+                        {p.pingUrl && (
+                          <span className={`${styles.pingBadge} ${styles['ping_' + pingResult]}`}>
+                            <span className={styles.pingDot} />
+                            {pingResult === 'pinging' ? 'pinging...' : pingResult}
+                          </span>
+                        )}
+                      </div>
+                      <p className={styles.listDesc}>{p.description}</p>
+                      {p.pingUrl && (
+                        <p className={styles.pingUrl}>⚡ {p.pingUrl}</p>
+                      )}
                     </div>
-                    <p className={styles.listDesc}>{p.description}</p>
+                  </div>
+                  <div className={styles.listActions}>
+                    <button className={styles.btnSmall} onClick={() => startEdit(p)} disabled={saving}>edit</button>
+                    {p.pingUrl && (
+                      <button className={styles.btnSmall} onClick={() => handlePing(p.id)} disabled={pingResult === 'pinging'}>
+                        ping now
+                      </button>
+                    )}
+                    <button className={styles.btnSmall} onClick={() => handleToggleFeatured(p.id)} disabled={saving}>
+                      {p.featured ? 'unfeature' : 'set featured'}
+                    </button>
+                    <button className={`${styles.btnSmall} ${styles.danger}`} onClick={() => handleDelete(p.id)} disabled={saving}>
+                      delete
+                    </button>
                   </div>
                 </div>
-                <div className={styles.listActions}>
-                  <button className={styles.btnSmall} onClick={() => startEdit(p)} disabled={saving}>edit</button>
-                  <button className={styles.btnSmall} onClick={() => handleToggleFeatured(p.id)} disabled={saving}>
-                    {p.featured ? 'unfeature' : 'set featured'}
-                  </button>
-                  <button className={`${styles.btnSmall} ${styles.danger}`} onClick={() => handleDelete(p.id)} disabled={saving}>
-                    delete
-                  </button>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </section>

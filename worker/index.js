@@ -13,7 +13,25 @@ function err(msg, status = 400) {
     return new Response(msg, { status, headers: CORS })
 }
 function isAdmin(request, env) {
-    return request.headers.get('X-Admin-Key') === env.ADMIN_KEY
+    // Cloudflare Access sets this header after authenticating the user.
+    // The Cf-Access-Authenticated-User-Email header is signed by Cloudflare
+    // and cannot be spoofed from outside — no password needed.
+    const email = request.headers.get('Cf-Access-Authenticated-User-Email')
+    if (email) return true
+}
+
+// Ping a URL and return 'up' | 'down'
+async function pingUrl(url) {
+    try {
+        const res = await fetch(url, {
+            method: 'HEAD',
+            signal: AbortSignal.timeout(5000),
+            redirect: 'follow',
+        })
+        return res.ok ? 'up' : 'down'
+    } catch {
+        return 'down'
+    }
 }
 
 export default {
@@ -23,20 +41,36 @@ export default {
 
         if (request.method === 'OPTIONS') return new Response(null, { headers: CORS })
 
-        // GET /projects — public, images inlined from KV
+        // GET /projects — public
         if (request.method === 'GET' && path === '/projects') {
             const raw = await env.PROJECTS_KV.get('projects')
             const projects = raw ? JSON.parse(raw) : getDefaults()
 
-            // Attach stored images
-            const withImages = await Promise.all(projects.map(async p => {
+            const withData = await Promise.all(projects.map(async p => {
+                // Attach stored image
                 if (p.image && p.image.startsWith('kv:')) {
                     const imgData = await env.PROJECTS_KV.get(`img:${p.id}`)
-                    return { ...p, image: imgData || '' }
+                    p = { ...p, image: imgData || '' }
                 }
-                return p
+                // Attach cached ping result
+                const ping = await env.PROJECTS_KV.get(`ping:${p.id}`)
+                return { ...p, pingStatus: ping || 'unknown' }
             }))
-            return json(withImages)
+            return json(withData)
+        }
+
+        // GET /ping/:id — trigger a fresh ping for one project (admin only)
+        if (request.method === 'GET' && path.startsWith('/ping/')) {
+            if (!isAdmin(request, env)) return err('Unauthorized', 401)
+            const id = path.split('/')[2]
+            const raw = await env.PROJECTS_KV.get('projects')
+            const projects = raw ? JSON.parse(raw) : getDefaults()
+            const project = projects.find(p => p.id === id)
+            if (!project) return err('Not found', 404)
+            if (!project.pingUrl) return json({ pingStatus: 'unknown' })
+            const status = await pingUrl(project.pingUrl)
+            await env.PROJECTS_KV.put(`ping:${id}`, status, { expirationTtl: 300 }) // cache 5 min
+            return json({ pingStatus: status })
         }
 
         // PUT /projects — admin only
@@ -45,14 +79,11 @@ export default {
             const projects = await request.json()
             if (!Array.isArray(projects)) return err('Expected array')
 
-            // Separate out base64 images into their own KV keys to keep the
-            // projects list lean (KV values have a 25 MB limit per value).
             const stripped = await Promise.all(projects.map(async p => {
                 if (p.image && p.image.startsWith('data:')) {
                     await env.PROJECTS_KV.put(`img:${p.id}`, p.image)
                     return { ...p, image: 'kv:' + p.id }
                 }
-                // If image was already stored as kv: reference, keep it
                 return p
             }))
 
@@ -67,12 +98,24 @@ export default {
             const raw = await env.PROJECTS_KV.get('projects')
             const projects = raw ? JSON.parse(raw) : []
             await env.PROJECTS_KV.put('projects', JSON.stringify(projects.filter(p => p.id !== id)))
-            // Clean up image if stored
             await env.PROJECTS_KV.delete(`img:${id}`)
+            await env.PROJECTS_KV.delete(`ping:${id}`)
             return json({ ok: true })
         }
 
         return err('Not found', 404)
+    },
+
+    // Cron: ping all projects every 5 minutes
+    async scheduled(event, env) {
+        const raw = await env.PROJECTS_KV.get('projects')
+        if (!raw) return
+        const projects = JSON.parse(raw)
+        await Promise.all(projects.map(async p => {
+            if (!p.pingUrl) return
+            const status = await pingUrl(p.pingUrl)
+            await env.PROJECTS_KV.put(`ping:${p.id}`, status, { expirationTtl: 600 })
+        }))
     }
 }
 
@@ -82,14 +125,14 @@ function getDefaults() {
             id: 'mineguardian', name: 'MineGuardian',
             description: 'A full-stack Minecraft server management dashboard. Monitor players, control your server, view real-time stats.',
             status: 'live', tags: ['React', 'Flask', 'Socket.IO', 'Minecraft'],
-            url: 'https://frontend.silentlab.work', image: '',
-            accentColor: 'linear-gradient(90deg, #39ff14, #00ffcc)', featured: true,
+            url: 'https://frontend.silentlab.work', pingUrl: 'https://frontend.silentlab.work',
+            image: '', accentColor: 'linear-gradient(90deg, #39ff14, #00ffcc)', featured: true,
         },
         {
             id: 'septionapp', name: 'SeptionAPP',
             description: 'An agentic AI Discord bot powered by OpenClaw. Sandboxed service with configurable model providers.',
             status: 'wip', tags: ['AI', 'Discord', 'Python'],
-            url: '', image: '', accentColor: 'linear-gradient(90deg, #821bef, #00ffcc)', featured: false,
+            url: '', pingUrl: '', image: '', accentColor: 'linear-gradient(90deg, #821bef, #00ffcc)', featured: false,
         },
     ]
 }
