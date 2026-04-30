@@ -82,16 +82,16 @@ export default function Admin() {
       ...form,
       id: form.id || Date.now().toString(),
       tags: typeof form.tags === 'string'
-        ? form.tags.split(',').map(t => t.trim()).filter(Boolean)
-        : form.tags,
+          ? form.tags.split(',').map(t => t.trim()).filter(Boolean)
+          : form.tags,
     }
     const updated = editingId
-      ? projects.map(p => p.id === editingId ? payload : p)
-      : [...projects, payload]
+        ? projects.map(p => p.id === editingId ? payload : p)
+        : [...projects, payload]
 
     setSaving(true)
     try {
-      await saveProjects(updated, adminKey)
+      await saveProjects(updated)
       setProjects(updated)
       setForm(EMPTY_PROJECT)
       clearImage()
@@ -109,7 +109,7 @@ export default function Admin() {
     if (editingId === id) cancelEdit()
     setSaving(true)
     try {
-      await deleteProject(id, adminKey)
+      await deleteProject(id)
       setProjects(p => p.filter(x => x.id !== id))
       setMsg('Deleted.')
     } catch (err) {
@@ -123,7 +123,7 @@ export default function Admin() {
     const updated = projects.map(p => ({ ...p, featured: p.id === id ? !p.featured : false }))
     setSaving(true)
     try {
-      await saveProjects(updated, adminKey)
+      await saveProjects(updated)
       setProjects(updated)
       setMsg('Updated.')
     } catch (err) {
@@ -137,7 +137,7 @@ export default function Admin() {
     setPinging(p => ({ ...p, [id]: 'pinging' }))
     try {
       const res = await fetch(`${WORKER_URL}/ping/${id}`, {
-        headers: adminKey ? { 'X-Admin-Key': adminKey } : {},
+        headers: {},
       })
       const data = await res.json()
       setPinging(p => ({ ...p, [id]: data.pingStatus }))
@@ -149,173 +149,173 @@ export default function Admin() {
   }
 
   return (
-    <div className={styles.wrap}>
-      <header className={styles.header}>
-        <p className={styles.label}>// silentlab admin</p>
-        <h1 className={styles.title}>Project Manager</h1>
-        <a href="/" className={styles.backLink}>← back to site</a>
-      </header>
+      <div className={styles.wrap}>
+        <header className={styles.header}>
+          <p className={styles.label}>// silentlab admin</p>
+          <h1 className={styles.title}>Project Manager</h1>
+          <a href="/" className={styles.backLink}>← back to site</a>
+        </header>
 
-      {msg && <div className={styles.msg}>{msg}</div>}
+        {msg && <div className={styles.msg}>{msg}</div>}
 
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>
-          {editingId ? `Editing: ${form.name || editingId}` : 'Add Project'}
-        </h2>
-        <form onSubmit={handleSave} className={styles.form}>
-          <div className={styles.row}>
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>
+            {editingId ? `Editing: ${form.name || editingId}` : 'Add Project'}
+          </h2>
+          <form onSubmit={handleSave} className={styles.form}>
+            <div className={styles.row}>
+              <div className={styles.field}>
+                <label>Name *</label>
+                <input name="name" value={form.name} onChange={handleChange} placeholder="MineGuardian" />
+              </div>
+              <div className={styles.field}>
+                <label>ID (leave blank to auto-generate)</label>
+                <input name="id" value={form.id} onChange={handleChange} placeholder="mineguardian" disabled={!!editingId} />
+              </div>
+            </div>
+
             <div className={styles.field}>
-              <label>Name *</label>
-              <input name="name" value={form.name} onChange={handleChange} placeholder="MineGuardian" />
+              <label>Description</label>
+              <textarea name="description" value={form.description} onChange={handleChange}
+                        placeholder="What does this project do?" rows={3} style={{ resize: 'vertical' }} />
             </div>
+
+            <div className={styles.row}>
+              <div className={styles.field}>
+                <label>Status</label>
+                <select name="status" value={form.status} onChange={handleChange}>
+                  <option value="live">Live</option>
+                  <option value="wip">In development</option>
+                  <option value="soon">Soon</option>
+                </select>
+              </div>
+              <div className={styles.field}>
+                <label>URL</label>
+                <input name="url" value={form.url} onChange={handleChange} placeholder="https://..." />
+              </div>
+            </div>
+
+            <div className={styles.row}>
+              <div className={styles.field}>
+                <label>Tags (comma-separated)</label>
+                <input name="tags" value={form.tags} onChange={handleChange} placeholder="React, Flask, Python" />
+              </div>
+              <div className={styles.field}>
+                <label>Ping URL (to check uptime)</label>
+                <input name="pingUrl" value={form.pingUrl} onChange={handleChange} placeholder="https://api.myproject.com/health" />
+              </div>
+            </div>
+
             <div className={styles.field}>
-              <label>ID (leave blank to auto-generate)</label>
-              <input name="id" value={form.id} onChange={handleChange} placeholder="mineguardian" disabled={!!editingId} />
+              <label>Accent color (CSS gradient or color)</label>
+              <input name="accentColor" value={form.accentColor} onChange={handleChange} />
             </div>
-          </div>
 
-          <div className={styles.field}>
-            <label>Description</label>
-            <textarea name="description" value={form.description} onChange={handleChange}
-              placeholder="What does this project do?" rows={3} style={{ resize: 'vertical' }} />
-          </div>
-
-          <div className={styles.row}>
             <div className={styles.field}>
-              <label>Status</label>
-              <select name="status" value={form.status} onChange={handleChange}>
-                <option value="live">Live</option>
-                <option value="wip">In development</option>
-                <option value="soon">Soon</option>
-              </select>
-            </div>
-            <div className={styles.field}>
-              <label>URL</label>
-              <input name="url" value={form.url} onChange={handleChange} placeholder="https://..." />
-            </div>
-          </div>
-
-          <div className={styles.row}>
-            <div className={styles.field}>
-              <label>Tags (comma-separated)</label>
-              <input name="tags" value={form.tags} onChange={handleChange} placeholder="React, Flask, Python" />
-            </div>
-            <div className={styles.field}>
-              <label>Ping URL (to check uptime)</label>
-              <input name="pingUrl" value={form.pingUrl} onChange={handleChange} placeholder="https://api.myproject.com/health" />
-            </div>
-          </div>
-
-          <div className={styles.field}>
-            <label>Accent color (CSS gradient or color)</label>
-            <input name="accentColor" value={form.accentColor} onChange={handleChange} />
-          </div>
-
-          <div className={styles.field}>
-            <label>Project Image</label>
-            <div className={styles.imageArea}>
-              {imagePreview ? (
-                <div className={styles.imagePreviewWrap}>
-                  <img src={imagePreview} alt="preview" className={styles.imagePreview} />
-                  <button type="button" className={`${styles.btnSmall} ${styles.danger}`} onClick={clearImage}>
-                    remove
-                  </button>
-                </div>
-              ) : (
-                <div
-                  className={styles.imageDropZone}
-                  onClick={() => fileInputRef.current?.click()}
-                  onDragOver={e => e.preventDefault()}
-                  onDrop={async e => {
-                    e.preventDefault()
-                    const file = e.dataTransfer.files?.[0]
-                    if (file) await handleImagePick({ target: { files: [file] } })
-                  }}
-                >
-                  <span className={styles.imageDropText}>Click or drag an image here</span>
-                  <span className={styles.imageDropHint}>PNG, JPG, WEBP · max 1.5 MB</span>
-                </div>
-              )}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/png,image/jpeg,image/webp,image/gif"
-                onChange={handleImagePick}
-                style={{ display: 'none' }}
-              />
-            </div>
-          </div>
-
-          <div className={styles.fieldInline}>
-            <input type="checkbox" name="featured" checked={form.featured} onChange={handleChange} id="feat" />
-            <label htmlFor="feat">Featured (full-width card)</label>
-          </div>
-
-          <div className={styles.formActions}>
-            <button type="submit" className={styles.btn} disabled={saving}>
-              {saving ? 'Saving...' : editingId ? 'Save Changes' : '+ Add Project'}
-            </button>
-            {editingId && (
-              <button type="button" className={`${styles.btn} ${styles.btnCancel}`} onClick={cancelEdit} disabled={saving}>
-                Cancel
-              </button>
-            )}
-          </div>
-        </form>
-      </section>
-
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Current Projects</h2>
-        {loading ? (
-          <p className={styles.muted}>Loading...</p>
-        ) : projects.length === 0 ? (
-          <p className={styles.muted}>No projects yet.</p>
-        ) : (
-          <div className={styles.list}>
-            {projects.map(p => {
-              const pingResult = pinging[p.id] || p.pingStatus || 'unknown'
-              return (
-                <div key={p.id} className={`${styles.listItem} ${editingId === p.id ? styles.listItemEditing : ''}`}>
-                  <div className={styles.listInfo}>
-                    {p.image && <img src={p.image} alt={p.name} className={styles.listThumb} />}
-                    <div className={styles.listMeta}>
-                      <div className={styles.listInfoRow}>
-                        <span className={styles.listName}>{p.name}</span>
-                        <span className={`${styles.badge} ${styles[p.status]}`}>{p.status}</span>
-                        {p.featured && <span className={styles.featBadge}>featured</span>}
-                        {p.pingUrl && (
-                          <span className={`${styles.pingBadge} ${styles['ping_' + pingResult]}`}>
-                            <span className={styles.pingDot} />
-                            {pingResult === 'pinging' ? 'pinging...' : pingResult}
-                          </span>
-                        )}
-                      </div>
-                      <p className={styles.listDesc}>{p.description}</p>
-                      {p.pingUrl && (
-                        <p className={styles.pingUrl}>⚡ {p.pingUrl}</p>
-                      )}
-                    </div>
-                  </div>
-                  <div className={styles.listActions}>
-                    <button className={styles.btnSmall} onClick={() => startEdit(p)} disabled={saving}>edit</button>
-                    {p.pingUrl && (
-                      <button className={styles.btnSmall} onClick={() => handlePing(p.id)} disabled={pingResult === 'pinging'}>
-                        ping now
+              <label>Project Image</label>
+              <div className={styles.imageArea}>
+                {imagePreview ? (
+                    <div className={styles.imagePreviewWrap}>
+                      <img src={imagePreview} alt="preview" className={styles.imagePreview} />
+                      <button type="button" className={`${styles.btnSmall} ${styles.danger}`} onClick={clearImage}>
+                        remove
                       </button>
-                    )}
-                    <button className={styles.btnSmall} onClick={() => handleToggleFeatured(p.id)} disabled={saving}>
-                      {p.featured ? 'unfeature' : 'set featured'}
-                    </button>
-                    <button className={`${styles.btnSmall} ${styles.danger}`} onClick={() => handleDelete(p.id)} disabled={saving}>
-                      delete
-                    </button>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        )}
-      </section>
-    </div>
+                    </div>
+                ) : (
+                    <div
+                        className={styles.imageDropZone}
+                        onClick={() => fileInputRef.current?.click()}
+                        onDragOver={e => e.preventDefault()}
+                        onDrop={async e => {
+                          e.preventDefault()
+                          const file = e.dataTransfer.files?.[0]
+                          if (file) await handleImagePick({ target: { files: [file] } })
+                        }}
+                    >
+                      <span className={styles.imageDropText}>Click or drag an image here</span>
+                      <span className={styles.imageDropHint}>PNG, JPG, WEBP · max 1.5 MB</span>
+                    </div>
+                )}
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/gif"
+                    onChange={handleImagePick}
+                    style={{ display: 'none' }}
+                />
+              </div>
+            </div>
+
+            <div className={styles.fieldInline}>
+              <input type="checkbox" name="featured" checked={form.featured} onChange={handleChange} id="feat" />
+              <label htmlFor="feat">Featured (full-width card)</label>
+            </div>
+
+            <div className={styles.formActions}>
+              <button type="submit" className={styles.btn} disabled={saving}>
+                {saving ? 'Saving...' : editingId ? 'Save Changes' : '+ Add Project'}
+              </button>
+              {editingId && (
+                  <button type="button" className={`${styles.btn} ${styles.btnCancel}`} onClick={cancelEdit} disabled={saving}>
+                    Cancel
+                  </button>
+              )}
+            </div>
+          </form>
+        </section>
+
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Current Projects</h2>
+          {loading ? (
+              <p className={styles.muted}>Loading...</p>
+          ) : projects.length === 0 ? (
+              <p className={styles.muted}>No projects yet.</p>
+          ) : (
+              <div className={styles.list}>
+                {projects.map(p => {
+                  const pingResult = pinging[p.id] || p.pingStatus || 'unknown'
+                  return (
+                      <div key={p.id} className={`${styles.listItem} ${editingId === p.id ? styles.listItemEditing : ''}`}>
+                        <div className={styles.listInfo}>
+                          {p.image && <img src={p.image} alt={p.name} className={styles.listThumb} />}
+                          <div className={styles.listMeta}>
+                            <div className={styles.listInfoRow}>
+                              <span className={styles.listName}>{p.name}</span>
+                              <span className={`${styles.badge} ${styles[p.status]}`}>{p.status}</span>
+                              {p.featured && <span className={styles.featBadge}>featured</span>}
+                              {p.pingUrl && (
+                                  <span className={`${styles.pingBadge} ${styles['ping_' + pingResult]}`}>
+                            <span className={styles.pingDot} />
+                                    {pingResult === 'pinging' ? 'pinging...' : pingResult}
+                          </span>
+                              )}
+                            </div>
+                            <p className={styles.listDesc}>{p.description}</p>
+                            {p.pingUrl && (
+                                <p className={styles.pingUrl}>⚡ {p.pingUrl}</p>
+                            )}
+                          </div>
+                        </div>
+                        <div className={styles.listActions}>
+                          <button className={styles.btnSmall} onClick={() => startEdit(p)} disabled={saving}>edit</button>
+                          {p.pingUrl && (
+                              <button className={styles.btnSmall} onClick={() => handlePing(p.id)} disabled={pingResult === 'pinging'}>
+                                ping now
+                              </button>
+                          )}
+                          <button className={styles.btnSmall} onClick={() => handleToggleFeatured(p.id)} disabled={saving}>
+                            {p.featured ? 'unfeature' : 'set featured'}
+                          </button>
+                          <button className={`${styles.btnSmall} ${styles.danger}`} onClick={() => handleDelete(p.id)} disabled={saving}>
+                            delete
+                          </button>
+                        </div>
+                      </div>
+                  )
+                })}
+              </div>
+          )}
+        </section>
+      </div>
   )
 }
