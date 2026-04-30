@@ -20,6 +20,7 @@ export function useProjects() {
 export async function saveProjects(projects) {
     const res = await fetch(`${WORKER_URL}/projects`, {
         method: 'PUT',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(projects),
     })
@@ -30,6 +31,7 @@ export async function saveProjects(projects) {
 export async function deleteProject(id) {
     const res = await fetch(`${WORKER_URL}/projects/${id}`, {
         method: 'DELETE',
+        credentials: 'include',
     })
     if (!res.ok) throw new Error(await res.text())
     return res.json()
